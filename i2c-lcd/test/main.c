@@ -1,6 +1,7 @@
 #include "intrinsics.h"
 #include <msp430.h>
 #include <stdbool.h>
+#include <stdio.h>
 #include <string.h>
 #include <lcd.h>
 
@@ -18,11 +19,14 @@ int main(void) {
     lcd_init();
     lcd_setup();
     //cursor_right();
+    __delay_cycles(500);
+    clear_cgram();
+    return_home();
+    //P2OUT |= BIT0;
     
     while(1)
     {      
         //cursor_right();
-        P2OUT |= BIT0;
         __delay_cycles(500);
         P1OUT |= BIT6;
         __delay_cycles(500);
@@ -38,12 +42,10 @@ int main(void) {
         DB7(0);
         DB6(0);
         DB5(0);
-        DB4(0);
+        DB4(1);
         __delay_cycles(500);
         P1OUT &= ~BIT6;
         __delay_cycles(500);
-        //
-        __delay_cycles(1);
 
 
     }
