@@ -2,18 +2,27 @@
 #include <stdbool.h>
 #include <string.h>
 
+
+#define CHECK_BIT(var,pos) ((var) & (1<<(pos)))
+
 void DB_on(int sel);
 void DB_off(int sel);
-void lcd_init()
-{
-    /*
+/*
     Pins 1.2-1.5 are connected to the data pins on the LCD.
     Pin 1.2 = DB7
     Pin 1.3 = DB6
     Pin 1.4 = DB5
     Pin 1.5 = DB4
     DB0-3 are unused
+    
+    //Pin to LCD
+    //Pin 1.6 = E
+    //Pin 1.7 = R/W
+    //Pin 2.0 = RS
     */
+
+void lcd_init()
+{
     P1DIR |= BIT2;  
     P1OUT &= ~BIT2;  
     P1DIR |= BIT3;  
@@ -22,14 +31,7 @@ void lcd_init()
     P1OUT &= ~BIT4;  
     P1DIR |= BIT5;  
     P1OUT &= ~BIT5;
-
-    /*
-    Pin to LCD
-    Pin 1.6 = E
-    Pin 1.7 = R/W
-    Pin 2.0 = RS
-    */
-    P1DIR |= BIT6;  
+    P1DIR |= BIT6;
     P1OUT &= ~BIT6;  
     P1DIR |= BIT7;  
     P1OUT &= ~BIT7;  
@@ -73,10 +75,10 @@ void lcd_setup()
     __delay_cycles(1000);
     P1OUT &= ~BIT6;
     __delay_cycles(500);
-    DB5(1);
+    DB5(0);
     DB7(1);
     DB6(1);
-    DB4(0);
+    DB4(1);
     P1OUT |= BIT6;
     __delay_cycles(1000);
     P1OUT &= ~BIT6;
@@ -117,58 +119,9 @@ void lcd_setup()
     
 }
 
-
-/*
-Function to change output of DB7 depending on int input.
-*/
-
-void read_mode()
-{
-
-}
-
-void DB_on(int sel)
-{
-    if(sel == 7)
-    {
-        P1OUT |= BIT2; 
-    }
-    else if(sel == 6)
-    {
-        P1OUT |= BIT3;
-    }
-    else if(sel == 5)
-    {
-        P1OUT |= BIT4;
-    }
-    else if(sel == 4)
-    {
-        P1OUT |= BIT5;
-    }
-}
-
-void DB_off(int sel)
-{
-    if(sel == 7)
-    {
-        P1OUT &= ~BIT2; 
-    }
-    else if(sel == 6)
-    {
-        P1OUT &= ~BIT3;
-    }
-    else if(sel == 5)
-    {
-        P1OUT &= ~BIT4;
-    }
-    else if(sel == 4)
-    {
-        P1OUT &= ~BIT5;
-    }
-}
-
 void DB7(int status)
 {
+    
     if(status == 1)
     {
         P1OUT |= BIT2; 
@@ -248,29 +201,6 @@ void cursor_right()
     __delay_cycles(5000);
 }
 
-void cursor_left()
-{
-    lcd_setup();
-    P1OUT |= BIT6;
-    __delay_cycles(1);
-    DB7(0);
-    DB6(0);
-    DB5(1);
-    DB4(0);
-    __delay_cycles(1);
-    P1OUT &= ~BIT6;
-    __delay_cycles(5000);
-    P1OUT |= BIT6;
-    __delay_cycles(1);
-    DB7(0);
-    DB6(0);
-    DB5(1);
-    DB4(0);
-    __delay_cycles(1);
-    P1OUT &= ~BIT6;
-    __delay_cycles(5000);
-}
-
 void clear_cgram()
 {
     P2OUT &= ~BIT0;
@@ -319,4 +249,60 @@ void return_home()
     P1OUT &= ~BIT6;
     __delay_cycles(500);
     P2OUT |= BIT0;
+}
+
+
+void lcd_write(int in)
+{
+        __delay_cycles(500);
+        P1OUT |= BIT6;
+        __delay_cycles(500);
+        if(CHECK_BIT(in,7) != 0){
+            DB7(1);
+        } else{
+            DB7(0);
+        }
+        if(CHECK_BIT(in,6) != 0){
+            DB6(1);
+        } else{
+            DB6(0);
+        }
+        if(CHECK_BIT(in,5) != 0){
+            DB5(1);
+        } else{
+            DB5(0);
+        }
+        if(CHECK_BIT(in,4) != 0){
+            DB4(1);
+        } else{
+            DB4(0);
+        }
+        __delay_cycles(500);
+        P1OUT &= ~BIT6;
+        __delay_cycles(500);
+        P1OUT |= BIT6;
+        __delay_cycles(500);
+        if(CHECK_BIT(in,3) != 0){
+            DB7(1);
+        } else{
+            DB7(0);
+        }
+        if(CHECK_BIT(in,2) != 0){
+            DB6(1);
+        } else{
+            DB6(0);
+        }
+        if(CHECK_BIT(in,1) != 0){
+            DB5(1);
+        } else{
+            DB5(0);
+        }
+        if(CHECK_BIT(in,0) != 0){
+            DB4(1);
+        } else{
+            DB4(0);
+        }   
+        __delay_cycles(500);
+        P1OUT &= ~BIT6;
+        __delay_cycles(500);
 }
