@@ -1,22 +1,35 @@
-#include <msp430fr2310.h>
+#include "intrinsics.h"
+#include <msp430.h>
 #include <stdbool.h>
+#include <stdio.h>
+#include <string.h>
+#include <lcd.h>
 
-int main(void)
-{
-    // Stop watchdog timer
-    WDTCTL = WDTPW | WDTHOLD;
 
-    P1OUT &= ~BIT0;
-    P1DIR |= BIT0;
+int main(void) { 
+    WDTCTL = WDTPW | WDTHOLD;  // Stop watchdog timer
 
-    // Disable low-power mode / GPIO high-impedance
-    PM5CTL0 &= ~LOCKLPM5;
+      
+   
 
-    while (true)
+
+    PM5CTL0 &= ~LOCKLPM5;  // Enable GPIO
+
+    __enable_interrupt();  // Enable global interrupts
+    lcd_init();
+    lcd_setup();
+    __delay_cycles(500);
+    clear_cgram();
+    return_home();
+    
+    while(1)
     {
-        P1OUT ^= BIT0;
-
-        // Delay for 100000*(1/MCLK)=0.1s
-        __delay_cycles(100000);
+        lcd_write(0x4C);
+        lcd_write(0b01001111);
+        lcd_write(0b01000011);
+        lcd_write(0b01001011);
+        lcd_write(0b01000101);
+        lcd_write(0b01000100);
     }
 }
+
