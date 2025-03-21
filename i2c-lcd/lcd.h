@@ -2,9 +2,6 @@
 #include <stdbool.h>
 #include <string.h>
 
-
-#define CHECK_BIT(var,pos) ((var) & (1<<(pos)))
-
 void DB_on(int sel);
 void DB_off(int sel);
 /*
