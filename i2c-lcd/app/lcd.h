@@ -9,8 +9,8 @@ void DB_on(int sel);
 void DB_off(int sel);
 /*
     Pins 1.2-1.5 are connected to the data pins on the LCD.
-    Pin 1.2 = DB7
-    Pin 1.3 = DB6
+    Pin 1.1 = DB7
+    Pin 1.0 = DB6
     Pin 1.4 = DB5
     Pin 1.5 = DB4
     DB0-3 are unused
@@ -23,10 +23,10 @@ void DB_off(int sel);
 
 void lcd_init()
 {
-    P1DIR |= BIT2;  
-    P1OUT &= ~BIT2;  
-    P1DIR |= BIT3;  
-    P1OUT &= ~BIT3;  
+    P1DIR |= BIT1;  
+    P1OUT &= ~BIT1;  
+    P1DIR |= BIT0;  
+    P1OUT &= ~BIT0;  
     P1DIR |= BIT4;  
     P1OUT &= ~BIT4;  
     P1DIR |= BIT5;  
@@ -78,7 +78,7 @@ void lcd_setup()
     DB5(0);
     DB7(1);
     DB6(1);
-    DB4(1);
+    DB4(0);
     P1OUT |= BIT6;
     __delay_cycles(1000);
     P1OUT &= ~BIT6;
@@ -124,11 +124,11 @@ void DB7(int status)
     
     if(status == 1)
     {
-        P1OUT |= BIT2; 
+        P1OUT |= BIT1; 
     }
     else 
     {
-        P1OUT &= ~BIT2;
+        P1OUT &= ~BIT1;
     }
 }
 
@@ -139,11 +139,11 @@ void DB6(int status)
 {
     if(status == 1)
     {
-        P1OUT |= BIT3; 
+        P1OUT |= BIT0; 
     }
     else 
     {
-        P1OUT &= ~BIT3;
+        P1OUT &= ~BIT0;
     }
 }
 
