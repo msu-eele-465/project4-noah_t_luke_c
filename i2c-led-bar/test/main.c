@@ -1,4 +1,5 @@
 #include <msp430.h>
+#include <ledbar.h>
 
 unsigned char RXData0=0;
 unsigned char RXData1=0;
@@ -9,6 +10,8 @@ int main(void)
 {
     WDTCTL = WDTPW | WDTHOLD;                             // Stop watchdog timer
 
+    P1DIR |= BIT1;
+    P1OUT &= ~BIT1;
     // Configure Pins for I2C
     P1SEL0 |= BIT2 | BIT3;                                // I2C pins
 
@@ -29,8 +32,16 @@ int main(void)
 
     __bis_SR_register(LPM0_bits | GIE);                   // Enter LPM0 w/ interrupts
     __no_operation();
+    LEDbarInit();
+    while(1){
+        if(RXData0 == 0xBB)
+        {
+            pattern0();
+        }
+    }
+   
 
-    
+
 }
 
 #if defined(__TI_COMPILER_VERSION__) || defined(__IAR_SYSTEMS_ICC__)
@@ -44,7 +55,7 @@ void __attribute__ ((interrupt(USCI_B0_VECTOR))) USCIB0_ISR (void)
 {
                                        // SLAVE0
         RXData0 = UCB0RXBUF;                              // Get RX data
-                               // Vector 24: RXIFG0 break;
+        __bic_SR_register_on_exit(LPM0_bits);                       // Vector 24: RXIFG0 break;
     
 
 }
