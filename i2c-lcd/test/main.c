@@ -23,8 +23,6 @@ int main(void) {
     UCB0I2COA0 = 0x0A | UCOAEN;                           //SLAVE0 own address is 0x0A| enable
     UCB0CTLW0 &=~UCSWRST;                                 //clear reset register
 
-    UCB0IE |=  UCRXIE0 | UCRXIE1| UCRXIE2 | UCRXIE3;      //receive interrupt enable
-
     //__bis_SR_register(LPM0_bits | GIE);                   // Enter LPM0 w/ interrupts
     __no_operation();
 
@@ -37,11 +35,9 @@ int main(void) {
     __delay_cycles(500);
     clear_cgram();
     return_home();
-    
+    UCB0IE |=  UCRXIE0 | UCRXIE1| UCRXIE2 | UCRXIE3;      //receive interrupt enable
     while(1)
     {
-        if(RXData == 0x1)
-        {
             lcd_write(0x4C);
             lcd_write(0b01001111);
             lcd_write(0b01000011);
@@ -49,17 +45,6 @@ int main(void) {
             lcd_write(0b01000101);
             lcd_write(0b01000100);
             return_home();
-        }
-        if(RXData == 0x0)
-        {
-            lcd_write(0x4A);
-            lcd_write(0b01001111);
-            lcd_write(0b01000011);
-            lcd_write(0b01001011);
-            lcd_write(0b01000101);
-            lcd_write(0b01000100);
-            return_home();
-        }
 
     }
 }
