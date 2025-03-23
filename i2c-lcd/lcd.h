@@ -38,7 +38,7 @@ void lcd_init()
 
 void lcd_setup()
 {
-    
+    /*
     __delay_cycles(500);
     DB5(1);
     DB7(1);
@@ -55,7 +55,9 @@ void lcd_setup()
     P1OUT |= BIT6;
     __delay_cycles(1000);
     P1OUT &= ~BIT6;
-    __delay_cycles(500);
+    */
+    lcd_write(11101110);
+    //__delay_cycles(500);
     DB5(0);
     DB7(0);
     DB6(0);
