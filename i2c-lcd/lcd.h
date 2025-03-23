@@ -177,6 +177,8 @@ void DB4(int status)
     }
 }
 
+
+
 void cursor_right()
 {
     //lcd_setup();

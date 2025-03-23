@@ -1,19 +1,18 @@
 #include "intrinsics.h"
 #include <msp430.h>
+#include <keypad.h>
 
 unsigned char data = 0;
 int main(void)
 {
     WDTCTL = WDTPW | WDTHOLD;
 
-    // Configure GPIO
-    P1OUT &= ~BIT0;
-    P1DIR |= BIT0;
     
     P1SEL1 &= ~BIT3;
     P1SEL1 &= ~BIT2;
     P1SEL0 |= BIT2 | BIT3;                  // I2C pins
     
+    keypadInit();
 
     // Disable the GPIO power-on default high-impedance mode to activate
     // previously configured port settings
@@ -40,6 +39,8 @@ int main(void)
 
     while (1)
     {
+
+        /*
         data = 0x0;
         UCB0CTLW0 |= UCTXSTT;
         // Delay for 100000*(1/MCLK)=0.1s
@@ -50,6 +51,12 @@ int main(void)
         // Delay for 100000*(1/MCLK)=0.1s
         __delay_cycles(1000000);
         //while (UCB0CTL1 & UCTXSTP);
+        */
+        data = scanPad();
+        if(data != 0)
+        {
+            P1OUT |= BIT0;
+        }
     }
 }
 
@@ -59,3 +66,5 @@ __interrupt void EUSCI_B0_I2C_ISR(void){
     UCB0TXBUF = data;
 
 }
+
+
