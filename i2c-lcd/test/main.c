@@ -40,18 +40,30 @@ int main(void) {
     
     while(1)
     {
+        if(RXData == 0x1)
+        {
             lcd_write(0x4C);
             lcd_write(0b01001111);
-            //lcd_write(0b01000011);
-            //lcd_write(0b01001011);
-            //lcd_write(0b01000101);
-            //lcd_write(0b01000100);
+            lcd_write(0b01000011);
+            lcd_write(0b01001011);
+            lcd_write(0b01000101);
+            lcd_write(0b01000100);
             return_home();
+        }
+        if(RXData == 0x0)
+        {
+            lcd_write(0x4A);
+            lcd_write(0b01001111);
+            lcd_write(0b01000011);
+            lcd_write(0b01001011);
+            lcd_write(0b01000101);
+            lcd_write(0b01000100);
+            return_home();
+        }
 
     }
 }
 
-/*
 #if defined(__TI_COMPILER_VERSION__) || defined(__IAR_SYSTEMS_ICC__)
 #pragma vector = USCI_B0_VECTOR
 __interrupt void USCIB0_ISR(void)
@@ -66,4 +78,4 @@ void __attribute__ ((interrupt(USCI_B0_VECTOR))) USCIB0_ISR (void)
         __bic_SR_register_on_exit(LPM0_bits);                       // Vector 24: RXIFG0 break;
     
 
-}*/
+}

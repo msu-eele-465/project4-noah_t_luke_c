@@ -2,6 +2,8 @@
 #include <stdbool.h>
 #include <string.h>
 
+#define CHECK_BIT(var,pos) ((var) & (1<<(pos)))
+
 void DB_on(int sel);
 void DB_off(int sel);
 /*
@@ -38,33 +40,7 @@ void lcd_init()
 
 void lcd_setup()
 {
-    /*
-    __delay_cycles(500);
-    DB5(1);
-    DB7(1);
-    DB6(1);
-    DB4(0);
-    P1OUT |= BIT6;
-    __delay_cycles(1000);
-    P1OUT &= ~BIT6;
-    __delay_cycles(500);
-    DB5(1);
-    DB7(1);
-    DB6(1);
-    DB4(0);
-    P1OUT |= BIT6;
-    __delay_cycles(1000);
-    P1OUT &= ~BIT6;
-    */
     lcd_write(11101110);
-    //__delay_cycles(500);
-    DB5(0);
-    DB7(0);
-    DB6(0);
-    DB4(0);
-    P1OUT |= BIT6;
-    __delay_cycles(1000);
-    P1OUT &= ~BIT6;
     __delay_cycles(500);
     DB5(0);
     DB7(0);
@@ -74,48 +50,10 @@ void lcd_setup()
     __delay_cycles(1000);
     P1OUT &= ~BIT6;
     __delay_cycles(500);
-    DB5(0);
-    DB7(1);
-    DB6(1);
-    DB4(1);
-    P1OUT |= BIT6;
-    __delay_cycles(1000);
-    P1OUT &= ~BIT6;
-    __delay_cycles(500);
-    DB5(0);
-    DB7(0);
-    DB6(0);
-    DB4(0);
-    P1OUT |= BIT6;
-    __delay_cycles(1000);
-    P1OUT &= ~BIT6;
-    __delay_cycles(500);
-    DB5(0);
-    DB7(0);
-    DB6(0);
-    DB4(1);
-    P1OUT |= BIT6;
-    __delay_cycles(1000);
-    P1OUT &= ~BIT6;
+    lcd_write(00001101);
+    lcd_write(00000001);
     __delay_cycles(10000);
-    DB5(0);
-    DB7(0);
-    DB6(0);
-    DB4(0);
-    P1OUT |= BIT6;
-    __delay_cycles(1000);
-    P1OUT &= ~BIT6;
-    __delay_cycles(500);   
-    DB7(0);
-    DB6(1);
-    DB5(1);
-    DB4(0);
-    P1OUT |= BIT6;
-    __delay_cycles(1000);
-    P1OUT &= ~BIT6;
-
-
-    
+    lcd_write(00000110);
 }
 
 void DB7(int status)
@@ -254,8 +192,6 @@ void return_home()
 void lcd_write(int in)
 {
         __delay_cycles(500);
-        P1OUT |= BIT6;
-        __delay_cycles(500);
         if(CHECK_BIT(in,7) != 0){
             DB7(1);
         } else{
@@ -277,9 +213,9 @@ void lcd_write(int in)
             DB4(0);
         }
         __delay_cycles(500);
-        P1OUT &= ~BIT6;
-        __delay_cycles(500);
         P1OUT |= BIT6;
+        __delay_cycles(1000);
+        P1OUT &= ~BIT6;
         __delay_cycles(500);
         if(CHECK_BIT(in,3) != 0){
             DB7(1);
@@ -302,6 +238,8 @@ void lcd_write(int in)
             DB4(0);
         }   
         __delay_cycles(500);
+        P1OUT |= BIT6;
+        __delay_cycles(1000);
         P1OUT &= ~BIT6;
         __delay_cycles(500);
 }
