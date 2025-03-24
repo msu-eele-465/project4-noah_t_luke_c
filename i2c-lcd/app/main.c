@@ -36,7 +36,6 @@ int main(void) {
         lcd_write(0b01001011);
         lcd_write(0b01000101);
         lcd_write(0b01000100);
-        */
     }
 }
 

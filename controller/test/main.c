@@ -70,12 +70,35 @@ __interrupt void ISR_PORT3_S2(void) {
     char input = scanPad();
         switch(input){
             case 'D':   //lockKeypad(unlock_code);
-                        break;
-            case '8':   data = 0x8;
+                        data = 0x16;
                         UCB0CTLW0 |= UCTXSTT;
                         P1OUT ^= BIT0;
                         break;
-                        
+            case '1':   data = 0x1;
+                        UCB0CTLW0 |= UCTXSTT;
+                        P1OUT ^= BIT0;
+                        break;
+            case '2':   data = 0x2;
+                        UCB0CTLW0 |= UCTXSTT;
+                        P1OUT ^= BIT0;
+                        break;
+            case '3':   data = 0x3;
+                        UCB0CTLW0 |= UCTXSTT;
+                        P1OUT ^= BIT0;
+                        break;
+            case 'A':   data = 0x4;
+                        UCB0CTLW0 |= UCTXSTT;
+                        P1OUT ^= BIT0;
+                        break;
+            case 'B':   data = 0x8;
+                        UCB0CTLW0 |= UCTXSTT;
+                        P1OUT ^= BIT0;
+                        break;
+            case '0':   data = 0x14;
+                        UCB0CTLW0 |= UCTXSTT;
+                        P1OUT ^= BIT0;
+                        break;
+
         }
 
     P3IFG &= ~BIT0;  // Clear the interrupt flag
