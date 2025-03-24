@@ -55,6 +55,9 @@ int main(void) {
             lcd_write(0x4C);
             lcd_write(0x4C);
             return_home();
+
+            //return_home();
+            RXData = 0;
         }
 
     }

@@ -98,7 +98,7 @@ __interrupt void ISR_PORT3_S2(void) {
                         UCB0CTLW0 |= UCTXSTT;
                         P1OUT ^= BIT0;
                         break;
-                       
+
         }
 
     P3IFG &= ~BIT0;  // Clear the interrupt flag
