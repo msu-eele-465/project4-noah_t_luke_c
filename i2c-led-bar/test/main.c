@@ -2,6 +2,9 @@
 #include <ledbar.h>
 
 unsigned char RXData=0;
+int start1 = 0;
+int start2 = 0;
+int start3 = 0;
 int main(void)
 {
     WDTCTL = WDTPW | WDTHOLD;                             // Stop watchdog timer
@@ -26,15 +29,9 @@ int main(void)
     __bis_SR_register(LPM0_bits | GIE);                   // Enter LPM0 w/ interrupts
     __no_operation();
     LEDbarInit();
-    while(1){
-        if(RXData == 0x1)
-        {
-            pattern0();
-        }
-        else if(RXData == 0x2)
-        {
-            pattern0_alt();
-        }
+    while(1)
+    {
+
     }
    
 
@@ -52,7 +49,31 @@ void __attribute__ ((interrupt(USCI_B0_VECTOR))) USCIB0_ISR (void)
 {
                                        // SLAVE0
         RXData = UCB0RXBUF;                              // Get RX data
+        
         __bic_SR_register_on_exit(LPM0_bits);                       // Vector 24: RXIFG0 break;
     
 
+}
+
+#pragma vector = TIMER0_B0_VECTOR
+__interrupt void ISR_TB0_CCR0(void) {
+    switch (RXData){
+            case 0x16:  clear();
+                        RXData = 0;
+                        break;
+            case 0x14:  clear();
+                        pattern0();
+                        break;
+            case 0x1:   clear();
+                        start1 = pattern1(start1);
+                        break;
+            case 0x2:   clear();
+                        start2 = pattern2(start2);
+                        break;
+            case 0x3:   clear();
+                        start3 = pattern3(start3);
+                        break;
+            default:    break;
+        }
+    TB0CCTL1 &= ~CCIFG;
 }
