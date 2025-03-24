@@ -31,7 +31,7 @@ int main(void)
         {
             pattern0();
         }
-        else if(RXData == 0x0)
+        else if(RXData == 0x2)
         {
             pattern0_alt();
         }
