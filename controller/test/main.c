@@ -2,14 +2,13 @@
 #include <msp430.h>
 #include <keypad.h>
 
+#define unlock_code "1738"
 unsigned char data = 0;
 int main(void)
 {
     WDTCTL = WDTPW | WDTHOLD;
 
-    
-    P1SEL1 &= ~BIT3;
-    P1SEL1 &= ~BIT2;
+    P1SEL1 &= ~BIT2 & BIT3;
     P1SEL0 |= BIT2 | BIT3;                  // I2C pins
     
     keypadInit();
@@ -23,7 +22,7 @@ int main(void)
     UCB0CTLW0 |= UCSSEL__SMCLK;
     UCB0BRW = 10;
     UCB0CTLW0 |= UCMODE_3 | UCMST | UCTR; // I2C mode, Master mode, TX
-    //UCB0CTLW1 |= UCASTP_2;                  // Automatic stop generated
+    UCB0CTLW1 |= UCASTP_2;                  // Automatic stop generated
                                             // after UCB0TBCNT is reached
     UCB0TBCNT = 0x0001;                     // number of bytes to be received
     UCB0I2CSA = 0x00A;                     // Slave address
@@ -33,13 +32,18 @@ int main(void)
     PM5CTL0 &= ~LOCKLPM5;
     UCB0CTLW0 &= ~UCSWRST;
 
-    UCB0IE |= UCTXIE0;
-
+    
+    UCB0IE |= UCTXIE0;  
     __enable_interrupt();
+    //lockKeypad("1738");
+    
+    P1OUT |= BIT0;
 
+    
     while (1)
     {
-
+        //__delay_cycles(100000);
+        //UCB0CTLW0 |= UCTXSTT;
         /*
         data = 0x0;
         UCB0CTLW0 |= UCTXSTT;
@@ -52,19 +56,31 @@ int main(void)
         __delay_cycles(1000000);
         //while (UCB0CTL1 & UCTXSTP);
         */
-        data = scanPad();
-        if(data != 0)
-        {
-            P1OUT |= BIT0;
-        }
     }
 }
 
+
 #pragma vector=EUSCI_B0_VECTOR
 __interrupt void EUSCI_B0_I2C_ISR(void){
-    P1OUT ^= BIT0;
     UCB0TXBUF = data;
-
 }
 
+#pragma vector = PORT3_VECTOR
+__interrupt void ISR_PORT3_S2(void) {
+    char input = scanPad();
+        switch(input){
+            case 'D':   //lockKeypad(unlock_code);
+                        break;
+            case '8':   data = 0x8;
+                        UCB0CTLW0 |= UCTXSTT;
+                        P1OUT ^= BIT0;
+                        break;
+                        
+        }
+
+    P3IFG &= ~BIT0;  // Clear the interrupt flag
+    P3IFG &= ~BIT1;  // Clear the interrupt flag
+    P3IFG &= ~BIT2;  // Clear the interrupt flag
+    P3IFG &= ~BIT3;  // Clear the interrupt flag
+}
 

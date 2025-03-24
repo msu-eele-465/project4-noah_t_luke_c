@@ -50,7 +50,7 @@ int main(void) {
             //lcd_write(0b01000100);
             return_home();
         }
-        if(RXData == 0x0)
+        if(RXData == 0x8)
         {
             lcd_write(0x4C);
             lcd_write(0x4C);

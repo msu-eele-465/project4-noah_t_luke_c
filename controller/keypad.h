@@ -1,10 +1,10 @@
 #include <msp430.h>
 #include <stdbool.h>
 
-#define unlock_code "1738"
+
 const char keys[4][4] = {{'1','2','3','A'},{'4','5','6','B'},{'7','8','9','C'},{'*','0','#','D'}};
-const char rowPins[4] = {BIT1, BIT2, BIT3, BIT4};
-const char col`Pins[4] = {BIT0, BIT1, BIT2, BIT3};
+const char rowPins[4] = {BIT0, BIT1, BIT2, BIT3};
+const char colPins[4] = {BIT0, BIT1, BIT2, BIT3};
 
 void keypadInit(void){
     WDTCTL = WDTPW | WDTHOLD;  // Stop watchdog timer
@@ -24,18 +24,18 @@ void keypadInit(void){
     P6DIR |= (BIT0 + BIT1 + BIT2 + BIT3);  // Set column pins as outputs
     P6OUT |= (BIT0 + BIT1 + BIT2 + BIT3);  // Set column pins high
 
-    // Row pins are 1.1 - 1.4, left 4 pins, descending left to right
-    // Pin 1.4 is row 0 (connected to the middle of the keypad) (row 0 is the top row)
-    // Pin 1.1 is row 3 (connected to the left of the keypad) (row 3 is the bottom row)
-    P3DIR &= ~(BIT1 + BIT2 + BIT4 + BIT4);  // Set row pins as inputs
-    P3REN |= (BIT1 + BIT2 + BIT3 + BIT4);  // Enable pull-up/down resistors
-    P3OUT &= ~(BIT1 + BIT2 + BIT3 + BIT4);  // Set pull-down for resistors
+    // Row pins are 3.0 - 3.3, left 4 pins, descending left to right
+    // Pin 3.3 is row 0 (connected to the middle of the keypad) (row 0 is the top row)
+    // Pin 3.0 is row 3 (connected to the left of the keypad) (row 3 is the bottom row)
+    P3DIR &= ~(BIT0 + BIT1 + BIT2 + BIT3);  // Set row pins as inputs
+    P3REN |= (BIT0 + BIT1 + BIT2 + BIT3);  // Enable pull-up/down resistors
+    P3OUT &= ~(BIT0 + BIT1 + BIT2 + BIT3);  // Set pull-down for resistors
 
-    // Interrupt Setup for port 1
+    // Interrupt Setup for port 3
     // Pins 1.1 1.2 1.3 1.4
-    P3IES &= ~(BIT1 + BIT2 + BIT3 + BIT4); // Set IRQ sensitivity to L-to-H
-    P3IFG &= ~(BIT1 + BIT2 + BIT3 + BIT4); // Clear IFG
-    P3IE |= (BIT1 + BIT2 + BIT3 + BIT4);   // Enable IRQs
+    P3IES &= ~(BIT0 + BIT1 + BIT2 + BIT3); // Set IRQ sensitivity to L-to-H
+    P3IFG &= ~(BIT0 + BIT1 + BIT2 + BIT3); // Clear IFG
+    P3IE |= (BIT0 + BIT1 + BIT2 + BIT3);   // Enable IRQs
 
     
 
@@ -56,11 +56,11 @@ void keypadInit(void){
 
     // Set up timer compare IRQs
     TB0CCTL0 &= ~CCIFG;  // Clear CCR0 flag
-    TB0CCTL0 |= CCIE;  // Enable flag
+    //TB0CCTL0 |= CCIE;  // Enable flag
 
     // Set up timer compare IRQs
     TB0CCTL1 &= ~CCIFG;  // Clear CCR1 flag
-    TB0CCTL1 |= CCIE;  // Enable flag
+    //TB0CCTL1 |= CCIE;  // Enable flag
 
 }
 
@@ -69,7 +69,7 @@ void lockKeypad(char str[]){ // Reset system until correct password is typed in
         TB0CCTL1 &= ~CCIE;  // Disable timer flag
 
         P1IE &= ~(BIT1 + BIT2 + BIT3 + BIT4);   // Disable IRQs
-        clear();
+        //clear();
         P1OUT &= ~BIT6;
         P3OUT &= ~BIT6;
         P1OUT |= BIT7;
@@ -100,7 +100,7 @@ char scanPad() { // Scan the keypad
 
         for (row = 0; row < 4; row++) {
             if ((P3IN & rowPins[row]) != 0) {  // Check if the column pin is high
-                while ((P1IN & rowPins[row]) != 0);  // Wait for key release
+                while ((P3IN & rowPins[row]) != 0);  // Wait for key release
                 __delay_cycles(50000);  // Debounce delay
                 P6OUT |= (BIT0 + BIT1 + BIT2 + BIT3);  // Set row pins high
                 return keys[row][col];  // Return the pressed key
