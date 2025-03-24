@@ -94,6 +94,14 @@ __interrupt void ISR_PORT3_S2(void) {
                         UCB0CTLW0 |= UCTXSTT;
                         P1OUT ^= BIT0;
                         break;
+            case '9':   data = 0x11;
+                        UCB0CTLW0 |= UCTXSTT;
+                        P1OUT ^= BIT0;
+                        break;
+            case 'C':   data = 0x12;
+                        UCB0CTLW0 |= UCTXSTT;
+                        P1OUT ^= BIT0;
+                        break;
             case '0':   data = 0x14;
                         UCB0CTLW0 |= UCTXSTT;
                         P1OUT ^= BIT0;

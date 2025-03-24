@@ -6,6 +6,8 @@
 #include <lcd.h>
 
 unsigned char RXData = 0;
+unsigned char current = 0;
+
 
 int main(void) { 
     WDTCTL = WDTPW | WDTHOLD;  // Stop watchdog timer
@@ -36,7 +38,7 @@ int main(void) {
     lcd_setup();
     __delay_cycles(500);
     clear_cgram();
-    return_home();
+    //return_home();
     
     while(1)
     {
@@ -50,6 +52,7 @@ int main(void) {
                         lcd_write(0b01100111);
                         lcd_write(0b01101100);
                         lcd_write(0b01100101);
+                        current = 0x1;
                         RXData = 0;
                         break;
             case 0x2:   clear_cgram();
@@ -63,6 +66,7 @@ int main(void) {
                         lcd_write(0b01110100);
                         lcd_write(0b01100101);
                         lcd_write(0b01110010);
+                        current = 0x2;
                         RXData = 0;
                         break;
             case 0x3:   clear_cgram();
@@ -76,6 +80,7 @@ int main(void) {
                         lcd_write(0b01101111);
                         lcd_write(0b01110101);
                         lcd_write(0b01110100);
+                        current = 0x3;
                         RXData = 0;
                         break;
             case 0x14:  clear_cgram();
@@ -85,6 +90,16 @@ int main(void) {
                         lcd_write(0b01110100);
                         lcd_write(0b01101001);
                         lcd_write(0b01100011);
+                        current = 0x14;
+                        RXData = 0;
+                        break;
+            case 0x11:  blink_toggle();
+                        RXData = current;
+                        break;
+            case 0x12:  cursor_toggle();
+                        RXData = current;
+                        break;
+            case 0x16:  clear_cgram();
                         RXData = 0;
                         break;
         }

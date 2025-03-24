@@ -4,6 +4,9 @@
 
 #define CHECK_BIT(var,pos) ((var) & (1<<(pos)))
 
+int blink_status = 1;
+int cursor_status = 1;
+
 void DB_on(int sel);
 void DB_off(int sel);
 /*
@@ -50,7 +53,7 @@ void lcd_setup()
     __delay_cycles(1000);
     P1OUT &= ~BIT6;
     __delay_cycles(500);
-    lcd_write(0b00001101);
+    lcd_write(0b00001111);
     lcd_write(0b00000001);
     __delay_cycles(10000);
     lcd_write(0b00000110);
@@ -116,10 +119,73 @@ void DB4(int status)
 
 void cursor_right()
 {
-    //lcd_setup();
     P2OUT &= ~BIT0;
     lcd_write(0b00010100);
-    __delay_cycles(5000);
+    __delay_cycles(500);
+    P2OUT |= BIT0;
+}
+
+// Toggle the blink functionality of the LCD cursor
+void blink_toggle()
+{   
+    P2OUT &= ~BIT0;
+    if(blink_status == 1)
+    {
+        if(cursor_status = 0)
+        {
+            lcd_write(0b00001100);
+        }
+        else if(cursor_status = 1)
+        {
+            lcd_write(0b00001110);
+        }
+        blink_status = 0;
+    }
+    else if(blink_status == 0)
+    {
+        if(cursor_status = 0)
+        {
+            lcd_write(0b00001101);
+        }
+        else if(cursor_status = 1)
+        {
+            lcd_write(0b00001111);
+        }
+        blink_status = 1;
+    }   
+    __delay_cycles(500);
+    P2OUT |= BIT0;
+}
+
+// Toggle the LCD cursor on/off
+void cursor_toggle()
+{
+    P2OUT &= ~BIT0;
+    if(cursor_status == 1)
+    {
+        if(blink_status = 0)
+        {
+            lcd_write(0b00001100);
+        }
+        else if(blink_status = 1)
+        {
+            lcd_write(0b00001101);
+        }
+        cursor_status = 0;
+    }
+    else if(cursor_status == 0)
+    {
+        if(blink_status = 0)
+        {
+            lcd_write(0b00001110);
+        }
+        else if(blink_status = 1)
+        {
+            lcd_write(0b00001111);
+        }
+        cursor_status = 1;
+    }   
+    __delay_cycles(500);
     P2OUT |= BIT0;
 }
 
