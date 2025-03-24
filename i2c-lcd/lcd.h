@@ -40,20 +40,20 @@ void lcd_init()
 
 void lcd_setup()
 {
-    lcd_write(11101110);
+    lcd_write(0b00100010);
     __delay_cycles(500);
     DB5(0);
-    DB7(0);
-    DB6(0);
+    DB7(1);
+    DB6(1);
     DB4(0);
     P1OUT |= BIT6;
     __delay_cycles(1000);
     P1OUT &= ~BIT6;
     __delay_cycles(500);
-    lcd_write(00001101);
-    lcd_write(00000001);
+    lcd_write(0b00001101);
+    lcd_write(0b00000001);
     __delay_cycles(10000);
-    lcd_write(00000110);
+    lcd_write(0b00000110);
 }
 
 void DB7(int status)
@@ -117,25 +117,10 @@ void DB4(int status)
 void cursor_right()
 {
     //lcd_setup();
-    
-    __delay_cycles(1);
-    DB7(0);
-    DB6(0);
-    DB5(0);
-    DB4(0);
-    P1OUT |= BIT6;
-    __delay_cycles(500);
-    P1OUT &= ~BIT6;
+    P2OUT &= ~BIT0;
+    lcd_write(0b00010100);
     __delay_cycles(5000);
-    __delay_cycles(1);
-    DB7(0);
-    DB6(1);
-    DB5(0);
-    DB4(0);
-    P1OUT |= BIT6;
-    __delay_cycles(500);
-    P1OUT &= ~BIT6;
-    __delay_cycles(5000);
+    P2OUT |= BIT0;
 }
 
 void clear_cgram()

@@ -40,22 +40,53 @@ int main(void) {
     
     while(1)
     {
-        if(RXData == 0x1)
+        switch(RXData)
         {
-            lcd_write(0x4C);
-            lcd_write(0b01001111);
-            //lcd_write(0b01000011);
-            //lcd_write(0b01001011);
-            //lcd_write(0b01000101);
-            //lcd_write(0b01000100);
-            return_home();
-        }
-        if(RXData == 0x8)
-        {
-            lcd_write(0x4C);
-            lcd_write(0x4C);
-            //return_home();
-            RXData = 0;
+            case 0:     break;
+            case 0x1:   clear_cgram();
+                        lcd_write(0b01110100);
+                        lcd_write(0b01101111);
+                        lcd_write(0b01100111);
+                        lcd_write(0b01100111);
+                        lcd_write(0b01101100);
+                        lcd_write(0b01100101);
+                        RXData = 0;
+                        break;
+            case 0x2:   clear_cgram();
+                        lcd_write(0b01110101);
+                        lcd_write(0b01110000);
+                        lcd_write(0b11111110);
+                        lcd_write(0b01100011);
+                        lcd_write(0b01101111);
+                        lcd_write(0b01110101);
+                        lcd_write(0b01101110);
+                        lcd_write(0b01110100);
+                        lcd_write(0b01100101);
+                        lcd_write(0b01110010);
+                        RXData = 0;
+                        break;
+            case 0x3:   clear_cgram();
+                        lcd_write(0b01101001);
+                        lcd_write(0b01101110);
+                        lcd_write(0b11111110);
+                        lcd_write(0b01100001);
+                        lcd_write(0b01101110);
+                        lcd_write(0b01100100);
+                        lcd_write(0b11111110);
+                        lcd_write(0b01101111);
+                        lcd_write(0b01110101);
+                        lcd_write(0b01110100);
+                        RXData = 0;
+                        break;
+            case 0x14:  clear_cgram();
+                        lcd_write(0b01110011);
+                        lcd_write(0b01110100);
+                        lcd_write(0b01100001);
+                        lcd_write(0b01110100);
+                        lcd_write(0b01101001);
+                        lcd_write(0b01100011);
+                        RXData = 0;
+                        break;
         }
 
     }
