@@ -54,6 +54,9 @@ int main(void) {
                         lcd_write(0b01100101);
                         current = 0x1;
                         RXData = 0;
+                        return_home();
+                        final_pos(); 
+                        lcd_write(0b00110001);
                         break;
             case 0x2:   clear_cgram();
                         lcd_write(0b01110101);
@@ -68,6 +71,8 @@ int main(void) {
                         lcd_write(0b01110010);
                         current = 0x2;
                         RXData = 0;
+                        final_pos();
+                        lcd_write(0b00110010);
                         break;
             case 0x3:   clear_cgram();
                         lcd_write(0b01101001);
@@ -82,6 +87,8 @@ int main(void) {
                         lcd_write(0b01110100);
                         current = 0x3;
                         RXData = 0;
+                        final_pos();
+                        lcd_write(0b00110011);
                         break;
             case 0x14:  clear_cgram();
                         lcd_write(0b01110011);
@@ -92,17 +99,25 @@ int main(void) {
                         lcd_write(0b01100011);
                         current = 0x14;
                         RXData = 0;
+                        final_pos();
+                        lcd_write(0b00110000);
                         break;
             case 0x11:  blink_toggle();
                         RXData = current;
+                        final_pos();
+                        lcd_write(0b00111001);
                         break;
             case 0x12:  cursor_toggle();
                         RXData = current;
+                        final_pos();
+                        lcd_write(0b01000011);
                         break;
             case 0x16:  clear_cgram();
                         RXData = 0;
                         break;
         }
+
+        
 
     }
 }

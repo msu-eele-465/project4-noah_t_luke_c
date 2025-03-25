@@ -41,6 +41,17 @@ void lcd_init()
     P2OUT &= ~BIT0;
 }
 
+// Brings cursor to last position on LCD screen
+void final_pos()
+{
+    return_home();
+    int i = 0;
+    for(i = 0; i<55; i++)
+    {
+        cursor_right();
+    } 
+}
+
 void lcd_setup()
 {
     lcd_write(0b00100010);
@@ -192,50 +203,14 @@ void cursor_toggle()
 void clear_cgram()
 {
     P2OUT &= ~BIT0;
-    __delay_cycles(500);
-    P1OUT |= BIT6;
-     __delay_cycles(500);
-    DB7(0);
-    DB6(0);
-    DB5(0);
-    DB4(0);
-    __delay_cycles(500);
-    P1OUT &= ~BIT6;
-    __delay_cycles(500);
-    P1OUT |= BIT6;
-    __delay_cycles(500);
-    DB7(0);
-    DB6(0);
-    DB5(0);
-    DB4(1);
-    __delay_cycles(500);
-    P1OUT &= ~BIT6;
-    __delay_cycles(500);
+    lcd_write(0b00000001);
     P2OUT |= BIT0;
 }
 
 void return_home()
 {
     P2OUT &= ~BIT0;
-    __delay_cycles(500);
-    P1OUT |= BIT6;
-     __delay_cycles(500);
-    DB7(0);
-    DB6(0);
-    DB5(0);
-    DB4(0);
-    __delay_cycles(500);
-    P1OUT &= ~BIT6;
-    __delay_cycles(500);
-    P1OUT |= BIT6;
-    __delay_cycles(500);
-    DB7(0);
-    DB6(0);
-    DB5(1);
-    DB4(0);
-    __delay_cycles(500);
-    P1OUT &= ~BIT6;
-    __delay_cycles(500);
+    lcd_write(0b00000010);
     P2OUT |= BIT0;
 }
 

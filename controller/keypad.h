@@ -37,13 +37,12 @@ void keypadInit(void){
     P3IFG &= ~(BIT0 + BIT1 + BIT2 + BIT3); // Clear IFG
     P3IE |= (BIT0 + BIT1 + BIT2 + BIT3);   // Enable IRQs
 
-    
+    // Pins for RGB status LED
+    P2DIR |= (BIT5 + BIT6 + BIT7);
+    P2OUT &= ~(BIT5 + BIT6 + BIT7);
 
-    P1DIR |= BIT0;  // P1.0 as output, used for heartbeat LED
+    P1DIR |= BIT0;  // P1.0 as output
     P1OUT &= ~BIT0;  // Clear P1.0
-
-    P6DIR |= BIT6;  // Green LED feedback
-    P6OUT &= ~BIT6;
 
     PM5CTL0 &= ~LOCKLPM5;  // Enable GPIO
 
@@ -65,26 +64,24 @@ void keypadInit(void){
 }
 
 
-void lockKeypad(char str[]){ // Reset system until correct password is typed in
-        TB0CCTL1 &= ~CCIE;  // Disable timer flag
-
-        P1IE &= ~(BIT1 + BIT2 + BIT3 + BIT4);   // Disable IRQs
-        //clear();
-        P1OUT &= ~BIT6;
-        P3OUT &= ~BIT6;
-        P1OUT |= BIT7;
+void lock_keypad(char str[]){ // Reset system until correct password is typed in
+        UCB0IE &= ~UCTXIE0;
+        P3IE &= ~(BIT0 + BIT1 + BIT2 + BIT3);   // Disable IRQs
+        P2OUT &= ~BIT7;
+        P2OUT &= ~BIT6;
+        P2OUT |= BIT5;
            
         while(scanPad() != str[0]);    // Wait for a 1
-        P1OUT |= BIT6;
+        P2OUT |= BIT6;
         while(scanPad() != str[1]);    // Wait for a 7
         while(scanPad() != str[2]);    // Wait for a 3
         while(scanPad() != str[3]);    // Wait for an 8
         
-        P1OUT &= ~BIT6;
-        P1OUT &= ~BIT7;
-        P3OUT |= BIT6;
-        P3IE |= (BIT1 + BIT2 + BIT3 + BIT4);   // Enable IRQs
-        TB0CCTL1 |= CCIE;  // Enable timer flag
+        P2OUT &= ~BIT5;
+        P2OUT &= ~BIT6;
+        P2OUT |= BIT7;
+        P3IE |= (BIT0 + BIT1 + BIT2 + BIT3);   // Enable IRQs
+        UCB0IE |= UCTXIE0;
         
 }
 
