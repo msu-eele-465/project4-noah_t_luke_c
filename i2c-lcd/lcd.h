@@ -6,9 +6,6 @@
 
 int blink_status = 1;
 int cursor_status = 1;
-
-void DB_on(int sel);
-void DB_off(int sel);
 /*
     Pins 1.2-1.5 are connected to the data pins on the LCD.
     Pin 1.1 = DB7
@@ -56,10 +53,10 @@ void lcd_setup()
 {
     lcd_write(0b00100010);
     __delay_cycles(500);
-    DB5(0);
-    DB7(1);
-    DB6(1);
-    DB4(0);
+    P1OUT &= ~BIT4;
+    P1OUT |= BIT1;
+    P1OUT |= BIT0;
+    P1OUT &= ~BIT5;
     P1OUT |= BIT6;
     __delay_cycles(1000);
     P1OUT &= ~BIT6;
@@ -68,64 +65,6 @@ void lcd_setup()
     lcd_write(0b00000001);
     __delay_cycles(10000);
     lcd_write(0b00000110);
-}
-
-void DB7(int status)
-{
-    
-    if(status == 1)
-    {
-        P1OUT |= BIT1; 
-    }
-    else 
-    {
-        P1OUT &= ~BIT1;
-    }
-}
-
-/*
-Function to change output of DB6 depending on int input.
-*/
-void DB6(int status)
-{
-    if(status == 1)
-    {
-        P1OUT |= BIT0; 
-    }
-    else 
-    {
-        P1OUT &= ~BIT0;
-    }
-}
-
-/*
-Function to change output of DB5 depending on int input.
-*/
-void DB5(int status)
-{
-    if(status == 1)
-    {
-        P1OUT |= BIT4; 
-    }
-    else 
-    {
-        P1OUT &= ~BIT4;
-    }
-}
-
-/*
-Function to change output of DB4 depending on int input.
-*/
-void DB4(int status)
-{
-    if(status == 1)
-    {
-        P1OUT |= BIT5; 
-    }
-    else 
-    {
-        P1OUT &= ~BIT5;
-    }
 }
 
 void cursor_right()
@@ -219,24 +158,24 @@ void lcd_write(int in)
 {
         __delay_cycles(500);
         if(CHECK_BIT(in,7) != 0){
-            DB7(1);
+            P1OUT |= BIT1;
         } else{
-            DB7(0);
+            P1OUT &= ~BIT1;
         }
         if(CHECK_BIT(in,6) != 0){
-            DB6(1);
+            P1OUT |= BIT0;
         } else{
-            DB6(0);
+            P1OUT &= ~BIT0;
         }
         if(CHECK_BIT(in,5) != 0){
-            DB5(1);
+            P1OUT |= BIT4;
         } else{
-            DB5(0);
+            P1OUT &= ~BIT4;
         }
         if(CHECK_BIT(in,4) != 0){
-            DB4(1);
+            P1OUT |= BIT5;
         } else{
-            DB4(0);
+            P1OUT &= ~BIT5;
         }
         __delay_cycles(500);
         P1OUT |= BIT6;
@@ -244,24 +183,24 @@ void lcd_write(int in)
         P1OUT &= ~BIT6;
         __delay_cycles(500);
         if(CHECK_BIT(in,3) != 0){
-            DB7(1);
+            P1OUT |= BIT1;
         } else{
-            DB7(0);
+            P1OUT &= ~BIT1;
         }
         if(CHECK_BIT(in,2) != 0){
-            DB6(1);
+            P1OUT |= BIT0;
         } else{
-            DB6(0);
+            P1OUT &= ~BIT0;
         }
         if(CHECK_BIT(in,1) != 0){
-            DB5(1);
+            P1OUT |= BIT4;
         } else{
-            DB5(0);
+            P1OUT &= ~BIT4;
         }
         if(CHECK_BIT(in,0) != 0){
-            DB4(1);
+            P1OUT |= BIT5;
         } else{
-            DB4(0);
+            P1OUT &= ~BIT5;
         }   
         __delay_cycles(500);
         P1OUT |= BIT6;
