@@ -35,7 +35,7 @@ void LEDbarInit(void){
     TB0CTL |= TBCLR;  // Clear timer and dividers
     TB0CTL |= TBSSEL__ACLK;  // Use ACLK
     TB0CTL |= MC__UP;  // Up counting mode
-    TB0CCR0 = 16000;    // Compare value
+    TB0CCR0 = 32768;    // Compare value
 
     // Set up timer compare IRQs
     TB0CCTL0 &= ~CCIFG;  // Clear CCR0 flag

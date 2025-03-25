@@ -7,6 +7,8 @@ int start2 = 0;
 int start3 = 0;
 int repeat = 0;
 int pattern = 100;
+int up_down = 0;
+int base_period = 32768;
 int main(void)
 {
     WDTCTL = WDTPW | WDTHOLD;                             // Stop watchdog timer
@@ -33,7 +35,36 @@ int main(void)
     LEDbarInit();
     while(1)
     {
-
+        if(up_down == 2)
+        {
+            base_period = base_period - 8192;
+            TB0CCTL0 &= ~CCIE;  // Disable flag
+            TB0CTL &= ~MC__UP;  // Stop counting mode
+            TB0CTL |= TBCLR;    // Clear timer and dividers
+            TB0CTL &= ~CM;
+            __delay_cycles(2);
+            TB0CCR0 = base_period;
+            TB0CCR0 = TB0CCR0;
+            TB0CTL |= CM;
+            TB0CTL |= MC__UP;   // Start timer
+            TB0CCTL0 |= CCIE;  // Enable flag 
+            up_down = 0;
+        }
+        else if(up_down == 1)
+        {
+            base_period = base_period + 8192;
+            TB0CCTL0 &= ~CCIE;  // Disable flag
+            TB0CTL &= ~MC__UP;  // Stop counting mode
+            TB0CTL |= TBCLR;    // Clear timer and dividers
+            TB0CTL &= ~CM;
+            __delay_cycles(2);
+            TB0CCR0 = base_period;
+            TB0CCR0 = TB0CCR0;
+            TB0CTL |= CM;
+            TB0CTL |= MC__UP;   // Start timer
+            TB0CCTL0 |= CCIE;  // Enable flag 
+            up_down = 0;
+        }
     }
    
 
@@ -97,6 +128,12 @@ __interrupt void ISR_TB0_CCR0(void) {
                         }
                         start3 = pattern3(start3);
                         pattern = 3;
+                        break;
+            case 0x4:   up_down = 2;
+                        RXData = pattern;
+                        break;
+            case 0x8:   up_down = 1;
+                        RXData = pattern;
                         break;
             case 0x11:  RXData = pattern;
                         break;
