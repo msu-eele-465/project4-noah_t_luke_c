@@ -6,6 +6,7 @@ int start1 = 0;
 int start2 = 0;
 int start3 = 0;
 int repeat = 0;
+int pattern = 100;
 int main(void)
 {
     WDTCTL = WDTPW | WDTHOLD;                             // Stop watchdog timer
@@ -68,6 +69,7 @@ __interrupt void ISR_TB0_CCR0(void) {
                         break;
             case 0x14:  clear();
                         pattern0();
+                        pattern = 0x14;
                         break;
             case 0x1:   clear();
                         if(repeat == 1)
@@ -76,6 +78,7 @@ __interrupt void ISR_TB0_CCR0(void) {
                             repeat = 0;
                         }
                         start1 = pattern1(start1);
+                        pattern = 1;
                         break;
             case 0x2:   clear();
                         if(repeat == 1)
@@ -84,6 +87,7 @@ __interrupt void ISR_TB0_CCR0(void) {
                             repeat = 0;
                         }
                         start2 = pattern2(start2);
+                        pattern = 2;
                         break;
             case 0x3:   clear();
                         if(repeat == 1)
@@ -92,6 +96,11 @@ __interrupt void ISR_TB0_CCR0(void) {
                             repeat = 0;
                         }
                         start3 = pattern3(start3);
+                        pattern = 3;
+                        break;
+            case 0x11:  RXData = pattern;
+                        break;
+            case 0x12:  RXData = pattern;
                         break;
             default:    break;
         }
