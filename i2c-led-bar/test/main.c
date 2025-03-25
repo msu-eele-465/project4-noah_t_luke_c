@@ -5,6 +5,7 @@ unsigned char RXData=0;
 int start1 = 0;
 int start2 = 0;
 int start3 = 0;
+int repeat = 0;
 int main(void)
 {
     WDTCTL = WDTPW | WDTHOLD;                             // Stop watchdog timer
@@ -48,6 +49,10 @@ void __attribute__ ((interrupt(USCI_B0_VECTOR))) USCIB0_ISR (void)
 #endif
 {
                                        // SLAVE0
+        if(UCB0RXBUF == RXData)
+        {
+            repeat = 1;
+        }
         RXData = UCB0RXBUF;                              // Get RX data
         
         __bic_SR_register_on_exit(LPM0_bits);                       // Vector 24: RXIFG0 break;
@@ -65,12 +70,27 @@ __interrupt void ISR_TB0_CCR0(void) {
                         pattern0();
                         break;
             case 0x1:   clear();
+                        if(repeat == 1)
+                        {
+                            start1 = 0;
+                            repeat = 0;
+                        }
                         start1 = pattern1(start1);
                         break;
             case 0x2:   clear();
+                        if(repeat == 1)
+                        {
+                            start2 = 0;
+                            repeat = 0;
+                        }
                         start2 = pattern2(start2);
                         break;
             case 0x3:   clear();
+                        if(repeat == 1)
+                        {
+                            start3 = 0;
+                            repeat = 0;
+                        }
                         start3 = pattern3(start3);
                         break;
             default:    break;
