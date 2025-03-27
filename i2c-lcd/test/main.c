@@ -6,6 +6,8 @@
 #include <lcd.h>
 
 unsigned char RXData = 0;
+unsigned char final = 0;
+
 
 int main(void) { 
     WDTCTL = WDTPW | WDTHOLD;  // Stop watchdog timer
@@ -36,29 +38,68 @@ int main(void) {
     lcd_setup();
     __delay_cycles(500);
     clear_cgram();
-    return_home();
-    
     while(1)
     {
-        if(RXData == 0x1)
+        final = RXData;
+        // Switch statement prints the pattern description depending on recieved data
+        switch(RXData)
         {
-            lcd_write(0x4C);
-            lcd_write(0b01001111);
-            //lcd_write(0b01000011);
-            //lcd_write(0b01001011);
-            //lcd_write(0b01000101);
-            //lcd_write(0b01000100);
+            case 0x10:  clear_cgram();
+                        final_pos();
+                        lcd_write(0b00111000);
+                        return_home();
+                        int i = 0;
+                        for(i = 0; i<0x100; i++)
+                        {
+                            lcd_write(i);
+                            __delay_cycles(200000);
+                        }
+                        RXData = 0;
+                        break;
+            case 0x11:  blink_toggle();
+                        break;
+            case 0x12:  cursor_toggle();
+                        break;
+            case 0x16:  clear_cgram();
+                        break;
+        }
+        
+        // This switch statement prints the last pressed key to the final position of the LCD
+        switch(final)
+        {
+            case 0:     break;
+            case 0x1:   final_pos();
+                        lcd_write(0b00110001);
+                        break;
+            case 0x2:   final_pos();
+                        lcd_write(0b00110010);
+                        break;
+            case 0x3:   final_pos();
+                        lcd_write(0b00110011);
+                        break;
+            case 0x4:   final_pos();
+                        lcd_write(0b01000001);
+                        break;
+            case 0x8:   final_pos();
+                        lcd_write(0b01000010);
+                        break;
+            case 0x11:  final_pos();
+                        lcd_write(0b00111001);
+                        break;
+            case 0x12:  final_pos();
+                        lcd_write(0b01000011);
+                        break;
+            case 0x14:  final_pos();
+                        lcd_write(0b00110000);
+                        break;
+            case 0x16:  break; 
+        }
+        if(final != 0)
+        {
             return_home();
         }
-        if(RXData == 0x8)
-        {
-            lcd_write(0x4C);
-            lcd_write(0x4C);
-            return_home();
-
-            //return_home();
-            RXData = 0;
-        }
+        final = 0;
+        
 
     }
 }
@@ -74,6 +115,7 @@ void __attribute__ ((interrupt(USCI_B0_VECTOR))) USCIB0_ISR (void)
 {
                                        // SLAVE0
         RXData = UCB0RXBUF;                              // Get RX data
+        P2OUT ^= BIT6;
         __bic_SR_register_on_exit(LPM0_bits);                       // Vector 24: RXIFG0 break;
     
 

@@ -3,7 +3,8 @@
 #include <keypad.h>
 
 #define unlock_code "1738"
-unsigned char data = 0;
+unsigned char data = 0x16;
+int lock_status = 1;
 int main(void)
 {
     WDTCTL = WDTPW | WDTHOLD;
@@ -33,29 +34,19 @@ int main(void)
     UCB0CTLW0 &= ~UCSWRST;
 
     
+    
     UCB0IE |= UCTXIE0;  
     __enable_interrupt();
-    //lockKeypad("1738");
+    UCB0CTLW0 |= UCTXSTT;
     
-    P1OUT |= BIT0;
-
     
     while (1)
     {
-        //__delay_cycles(100000);
-        //UCB0CTLW0 |= UCTXSTT;
-        /*
-        data = 0x0;
-        UCB0CTLW0 |= UCTXSTT;
-        // Delay for 100000*(1/MCLK)=0.1s
-        __delay_cycles(1000000);
-        //while (UCB0CTL0 & UCTXSTP);
-        data = 0x1;
-        UCB0CTLW0 |= UCTXSTT;
-        // Delay for 100000*(1/MCLK)=0.1s
-        __delay_cycles(1000000);
-        //while (UCB0CTL1 & UCTXSTP);
-        */
+        if(lock_status == 1)
+        {
+            lock_keypad(unlock_code);
+            lock_status = 0;
+        }
     }
 }
 
@@ -63,16 +54,16 @@ int main(void)
 #pragma vector=EUSCI_B0_VECTOR
 __interrupt void EUSCI_B0_I2C_ISR(void){
     UCB0TXBUF = data;
+    P1OUT ^= BIT0;
 }
 
 #pragma vector = PORT3_VECTOR
 __interrupt void ISR_PORT3_S2(void) {
     char input = scanPad();
         switch(input){
-            case 'D':   //lockKeypad(unlock_code);
-                        data = 0x16;
+            case 'D':   data = 0x16;
                         UCB0CTLW0 |= UCTXSTT;
-                        P1OUT ^= BIT0;
+                        lock_status = 1;
                         break;
             case '1':   data = 0x1;
                         UCB0CTLW0 |= UCTXSTT;
@@ -86,6 +77,10 @@ __interrupt void ISR_PORT3_S2(void) {
                         UCB0CTLW0 |= UCTXSTT;
                         P1OUT ^= BIT0;
                         break;
+            case '8':   data = 0x10;
+                        UCB0CTLW0 |= UCTXSTT;
+                        P1OUT ^= BIT0;
+                        break;
             case 'A':   data = 0x4;
                         UCB0CTLW0 |= UCTXSTT;
                         P1OUT ^= BIT0;
@@ -94,11 +89,19 @@ __interrupt void ISR_PORT3_S2(void) {
                         UCB0CTLW0 |= UCTXSTT;
                         P1OUT ^= BIT0;
                         break;
+            case '9':   data = 0x11;
+                        UCB0CTLW0 |= UCTXSTT;
+                        P1OUT ^= BIT0;
+                        break;
+            case 'C':   data = 0x12;
+                        UCB0CTLW0 |= UCTXSTT;
+                        P1OUT ^= BIT0;
+                        break;
             case '0':   data = 0x14;
                         UCB0CTLW0 |= UCTXSTT;
                         P1OUT ^= BIT0;
                         break;
-
+                       
         }
 
     P3IFG &= ~BIT0;  // Clear the interrupt flag

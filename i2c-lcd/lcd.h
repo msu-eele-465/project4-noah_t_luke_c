@@ -4,8 +4,8 @@
 
 #define CHECK_BIT(var,pos) ((var) & (1<<(pos)))
 
-void DB_on(int sel);
-void DB_off(int sel);
+int blink_status = 1;
+int cursor_status = 1;
 /*
     Pins 1.2-1.5 are connected to the data pins on the LCD.
     Pin 1.1 = DB7
@@ -36,157 +36,127 @@ void lcd_init()
     P1OUT &= ~BIT7;  
     P2DIR |= BIT0;  
     P2OUT &= ~BIT0;
+
+    P2DIR |= BIT6;
+    P2OUT &= ~BIT6;
+}
+
+// Brings cursor to last position on LCD screen
+void final_pos()
+{
+    return_home();
+    int i = 0;
+    for(i = 0; i<55; i++)
+    {
+        cursor_right();
+    } 
 }
 
 void lcd_setup()
 {
-    lcd_write(11101110);
+    lcd_write(0b00100010);
     __delay_cycles(500);
-    DB5(0);
-    DB7(0);
-    DB6(0);
-    DB4(0);
+    P1OUT &= ~BIT4;
+    P1OUT |= BIT1;
+    P1OUT |= BIT0;
+    P1OUT &= ~BIT5;
     P1OUT |= BIT6;
     __delay_cycles(1000);
     P1OUT &= ~BIT6;
     __delay_cycles(500);
-    lcd_write(00001101);
-    lcd_write(00000001);
+    lcd_write(0b00001111);
+    lcd_write(0b00000001);
     __delay_cycles(10000);
-    lcd_write(00000110);
-}
-
-void DB7(int status)
-{
-    
-    if(status == 1)
-    {
-        P1OUT |= BIT1; 
-    }
-    else 
-    {
-        P1OUT &= ~BIT1;
-    }
-}
-
-/*
-Function to change output of DB6 depending on int input.
-*/
-void DB6(int status)
-{
-    if(status == 1)
-    {
-        P1OUT |= BIT0; 
-    }
-    else 
-    {
-        P1OUT &= ~BIT0;
-    }
-}
-
-/*
-Function to change output of DB5 depending on int input.
-*/
-void DB5(int status)
-{
-    if(status == 1)
-    {
-        P1OUT |= BIT4; 
-    }
-    else 
-    {
-        P1OUT &= ~BIT4;
-    }
-}
-
-/*
-Function to change output of DB4 depending on int input.
-*/
-void DB4(int status)
-{
-    if(status == 1)
-    {
-        P1OUT |= BIT5; 
-    }
-    else 
-    {
-        P1OUT &= ~BIT5;
-    }
+    lcd_write(0b00000110);
 }
 
 
 
 void cursor_right()
 {
-    //lcd_setup();
-    
-    __delay_cycles(1);
-    DB7(0);
-    DB6(0);
-    DB5(0);
-    DB4(0);
-    P1OUT |= BIT6;
+    P2OUT &= ~BIT0;
+    lcd_write(0b00010100);
     __delay_cycles(500);
-    P1OUT &= ~BIT6;
-    __delay_cycles(5000);
-    __delay_cycles(1);
-    DB7(0);
-    DB6(1);
-    DB5(0);
-    DB4(0);
-    P1OUT |= BIT6;
+    P2OUT |= BIT0;
+}
+
+// Toggle the blink functionality of the LCD cursor
+void blink_toggle()
+{   
+    P2OUT &= ~BIT0;
     __delay_cycles(500);
-    P1OUT &= ~BIT6;
-    __delay_cycles(5000);
+    if(blink_status == 1)
+    {
+        if(cursor_status = 0)
+        {
+            lcd_write(0b00001100);
+        }
+        else if(cursor_status = 1)
+        {
+            lcd_write(0b00001110);
+        }
+        blink_status = 0;
+    }
+    else if(blink_status == 0)
+    {
+        if(cursor_status = 0)
+        {
+            lcd_write(0b00001101);
+        }
+        else if(cursor_status = 1)
+        {
+            lcd_write(0b00001111);
+        }
+        blink_status = 1;
+    }   
+    __delay_cycles(500);
+    P2OUT |= BIT0;
+}
+
+// Toggle the LCD cursor on/off
+void cursor_toggle()
+{
+    P2OUT &= ~BIT0;
+    __delay_cycles(500);
+    if(cursor_status == 1)
+    {
+        if(blink_status = 0)
+        {
+            lcd_write(0b00001100);
+        }
+        else if(blink_status = 1)
+        {
+            lcd_write(0b00001101);
+        }
+        cursor_status = 0;
+    }
+    else if(cursor_status == 0)
+    {
+        if(blink_status = 0)
+        {
+            lcd_write(0b00001110);
+        }
+        else if(blink_status = 1)
+        {
+            lcd_write(0b00001111);
+        }
+        cursor_status = 1;
+    }   
+    __delay_cycles(500);
+    P2OUT |= BIT0;
 }
 
 void clear_cgram()
 {
     P2OUT &= ~BIT0;
-    __delay_cycles(500);
-    P1OUT |= BIT6;
-     __delay_cycles(500);
-    DB7(0);
-    DB6(0);
-    DB5(0);
-    DB4(0);
-    __delay_cycles(500);
-    P1OUT &= ~BIT6;
-    __delay_cycles(500);
-    P1OUT |= BIT6;
-    __delay_cycles(500);
-    DB7(0);
-    DB6(0);
-    DB5(0);
-    DB4(1);
-    __delay_cycles(500);
-    P1OUT &= ~BIT6;
-    __delay_cycles(500);
+    lcd_write(0b00000001);
     P2OUT |= BIT0;
 }
 
 void return_home()
 {
     P2OUT &= ~BIT0;
-    __delay_cycles(500);
-    P1OUT |= BIT6;
-     __delay_cycles(500);
-    DB7(0);
-    DB6(0);
-    DB5(0);
-    DB4(0);
-    __delay_cycles(500);
-    P1OUT &= ~BIT6;
-    __delay_cycles(500);
-    P1OUT |= BIT6;
-    __delay_cycles(500);
-    DB7(0);
-    DB6(0);
-    DB5(1);
-    DB4(0);
-    __delay_cycles(500);
-    P1OUT &= ~BIT6;
-    __delay_cycles(500);
+    lcd_write(0b00000010);
     P2OUT |= BIT0;
 }
 
@@ -195,24 +165,24 @@ void lcd_write(int in)
 {
         __delay_cycles(500);
         if(CHECK_BIT(in,7) != 0){
-            DB7(1);
+            P1OUT |= BIT1;
         } else{
-            DB7(0);
+            P1OUT &= ~BIT1;
         }
         if(CHECK_BIT(in,6) != 0){
-            DB6(1);
+            P1OUT |= BIT0;
         } else{
-            DB6(0);
+            P1OUT &= ~BIT0;
         }
         if(CHECK_BIT(in,5) != 0){
-            DB5(1);
+            P1OUT |= BIT4;
         } else{
-            DB5(0);
+            P1OUT &= ~BIT4;
         }
         if(CHECK_BIT(in,4) != 0){
-            DB4(1);
+            P1OUT |= BIT5;
         } else{
-            DB4(0);
+            P1OUT &= ~BIT5;
         }
         __delay_cycles(500);
         P1OUT |= BIT6;
@@ -220,24 +190,24 @@ void lcd_write(int in)
         P1OUT &= ~BIT6;
         __delay_cycles(500);
         if(CHECK_BIT(in,3) != 0){
-            DB7(1);
+            P1OUT |= BIT1;
         } else{
-            DB7(0);
+            P1OUT &= ~BIT1;
         }
         if(CHECK_BIT(in,2) != 0){
-            DB6(1);
+            P1OUT |= BIT0;
         } else{
-            DB6(0);
+            P1OUT &= ~BIT0;
         }
         if(CHECK_BIT(in,1) != 0){
-            DB5(1);
+            P1OUT |= BIT4;
         } else{
-            DB5(0);
+            P1OUT &= ~BIT4;
         }
         if(CHECK_BIT(in,0) != 0){
-            DB4(1);
+            P1OUT |= BIT5;
         } else{
-            DB4(0);
+            P1OUT &= ~BIT5;
         }   
         __delay_cycles(500);
         P1OUT |= BIT6;
