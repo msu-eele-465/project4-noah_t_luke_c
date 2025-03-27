@@ -30,6 +30,20 @@ void LEDbarInit(void){
     // LED8
     P2DIR |= BIT0;
     P2OUT &= ~ BIT0;
+
+    //I2C status
+    P1DIR |= BIT4;
+    P1OUT &= ~BIT4;
+
+    // Setup Timer B0
+    TB0CTL |= TBCLR;  // Clear timer and dividers
+    TB0CTL |= TBSSEL__ACLK;  // Use ACLK
+    TB0CTL |= MC__UP;  // Up counting mode
+    TB0CCR0 = 32768;    // Compare value
+
+    // Set up timer compare IRQs
+    TB0CCTL0 &= ~CCIFG;  // Clear CCR0 flag
+    TB0CCTL0 |= CCIE;  // Enable flag
 }
 
 void ON(int led){
