@@ -28,7 +28,7 @@ int main(void)
     UCB0I2COA0 = 0x0A | UCOAEN;                           //SLAVE0 own address is 0x0A| enable
     UCB0CTLW0 &=~UCSWRST;                                 //clear reset register
 
-    UCB0IE |=  UCRXIE0 | UCRXIE1| UCRXIE2 | UCRXIE3;      //receive interrupt enable
+    UCB0IE |=  UCRXIE0;     //receive interrupt enable
 
     __bis_SR_register(LPM0_bits | GIE);                   // Enter LPM0 w/ interrupts
     __no_operation();
@@ -86,7 +86,7 @@ void __attribute__ ((interrupt(USCI_B0_VECTOR))) USCIB0_ISR (void)
             repeat = 1;
         }
         RXData = UCB0RXBUF;                              // Get RX data
-        
+        P1OUT ^= BIT4;
         __bic_SR_register_on_exit(LPM0_bits);                       // Vector 24: RXIFG0 break;
     
 

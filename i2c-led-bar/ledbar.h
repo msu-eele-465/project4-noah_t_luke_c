@@ -31,6 +31,10 @@ void LEDbarInit(void){
     P2DIR |= BIT0;
     P2OUT &= ~ BIT0;
 
+    //I2C status
+    P1DIR |= BIT4;
+    P1OUT &= ~BIT4;
+
     // Setup Timer B0
     TB0CTL |= TBCLR;  // Clear timer and dividers
     TB0CTL |= TBSSEL__ACLK;  // Use ACLK
