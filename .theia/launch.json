@@ -2,12 +2,24 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "CCS Debug",
+            "type": "ccs-debug",
+            "request": "launch"
             "name": "i2c-lcd",
             "type": "ccs-debug",
             "request": "launch",
             "projectInfo": {
                 "name": "i2c-lcd",
                 "resourceId": "/i2c-lcd"
+            }
+        },
+        {
+            "name": "i2c-led-bar",
+            "type": "ccs-debug",
+            "request": "launch",
+            "projectInfo": {
+                "name": "i2c-led-bar",
+                "resourceId": "/i2c-led-bar"
             }
 
         },

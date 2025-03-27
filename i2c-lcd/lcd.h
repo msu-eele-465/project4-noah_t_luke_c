@@ -70,6 +70,8 @@ void lcd_setup()
     lcd_write(0b00000110);
 }
 
+
+
 void cursor_right()
 {
     P2OUT &= ~BIT0;
