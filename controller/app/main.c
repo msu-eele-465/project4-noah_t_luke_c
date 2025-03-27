@@ -1,84 +1,114 @@
-/* --COPYRIGHT--,BSD_EX
- * Copyright (c) 2016, Texas Instruments Incorporated
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * *  Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *
- * *  Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- *
- * *  Neither the name of Texas Instruments Incorporated nor the names of
- *    its contributors may be used to endorse or promote products derived
- *    from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
- * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
- * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
- * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
- * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *******************************************************************************
- *
- *                       MSP430 CODE EXAMPLE DISCLAIMER
- *
- * MSP430 code examples are self-contained low-level programs that typically
- * demonstrate a single peripheral function or device feature in a highly
- * concise manner. For this the code may rely on the device's power-on default
- * register values and settings such as the clock configuration and care must
- * be taken when combining code from several examples to avoid potential side
- * effects. Also see www.ti.com/grace for a GUI- and www.ti.com/msp430ware
- * for an API functional library-approach to peripheral configuration.
- *
- * --/COPYRIGHT--*/
-//******************************************************************************
-//  MSP430FR235x Demo - Toggle P1.0 using software
-//
-//  Description: Toggle P1.0 every 0.1s using software.
-//  By default, FR235x select XT1 as FLL reference.
-//  If XT1 is present, the PxSEL(XIN & XOUT) needs to configure.
-//  If XT1 is absent, switch to select REFO as FLL reference automatically.
-//  XT1 is considered to be absent in this example.
-//  ACLK = default REFO ~32768Hz, MCLK = SMCLK = default DCODIV ~1MHz.
-//
-//           MSP430FR2355
-//         ---------------
-//     /|\|               |
-//      | |               |
-//      --|RST            |
-//        |           P1.0|-->LED
-//
-//   Cash Hao
-//   Texas Instruments Inc.
-//   November 2016
-//   Built with IAR Embedded Workbench v6.50.0 & Code Composer Studio v6.2.0
-//******************************************************************************
+#include "intrinsics.h"
 #include <msp430.h>
+#include <keypad.h>
 
+#define unlock_code "1738"
+unsigned char data = 0x16;
+int lock_status = 1;
 int main(void)
 {
-    WDTCTL = WDTPW | WDTHOLD;               // Stop watchdog timer
+    WDTCTL = WDTPW | WDTHOLD;
+
+    P1SEL1 &= ~BIT2 & BIT3;
+    P1SEL0 |= BIT2 | BIT3;                  // I2C pins
     
-    P1OUT &= ~BIT0;                         // Clear P1.0 output latch for a defined power-on state
-    P1DIR |= BIT0;                          // Set P1.0 to output direction
+    keypadInit();
 
-    PM5CTL0 &= ~LOCKLPM5;                   // Disable the GPIO power-on default high-impedance mode
-                                            // to activate previously configured port settings
+    // Disable the GPIO power-on default high-impedance mode to activate
+    // previously configured port settings
+    PM5CTL0 &= ~LOCKLPM5;
 
-    while(1)
+    // Configure USCI_B0 for I2C mode
+    UCB0CTLW0 |= UCSWRST;                   // Software reset enabled
+    UCB0CTLW0 |= UCSSEL__SMCLK;
+    UCB0BRW = 10;
+    UCB0CTLW0 |= UCMODE_3 | UCMST | UCTR; // I2C mode, Master mode, TX
+    UCB0CTLW1 |= UCASTP_2;                  // Automatic stop generated
+                                            // after UCB0TBCNT is reached
+    UCB0TBCNT = 0x0001;                     // number of bytes to be received
+    UCB0I2CSA = 0x00A;                     // Slave address
+    
+
+    // Disable low-power mode / GPIO high-impedance
+    PM5CTL0 &= ~LOCKLPM5;
+    UCB0CTLW0 &= ~UCSWRST;
+
+    
+    
+    UCB0IE |= UCTXIE0;  
+    __enable_interrupt();
+    UCB0CTLW0 |= UCTXSTT;
+    
+    
+    while (1)
     {
-        P1OUT ^= BIT0;                      // Toggle P1.0 using exclusive-OR
-        __delay_cycles(100000);             // Delay for 100000*(1/MCLK)=0.1s
+        if(lock_status == 1)
+        {
+            lock_keypad(unlock_code);
+            lock_status = 0;
+        }
     }
+
+
 }
+
+
+#pragma vector=EUSCI_B0_VECTOR
+__interrupt void EUSCI_B0_I2C_ISR(void){
+    UCB0TXBUF = data;
+    P1OUT ^= BIT0;
+}
+
+#pragma vector = PORT3_VECTOR
+__interrupt void ISR_PORT3_S2(void) {
+    char input = scanPad();
+        switch(input){
+            case 'D':   data = 0x16;
+                        UCB0CTLW0 |= UCTXSTT;
+                        lock_status = 1;
+                        break;
+            case '1':   data = 0x1;
+                        UCB0CTLW0 |= UCTXSTT;
+                        P1OUT ^= BIT0;
+                        break;
+            case '2':   data = 0x2;
+                        UCB0CTLW0 |= UCTXSTT;
+                        P1OUT ^= BIT0;
+                        break;
+            case '3':   data = 0x3;
+                        UCB0CTLW0 |= UCTXSTT;
+                        P1OUT ^= BIT0;
+                        break;
+            case '8':   data = 0x10;
+                        UCB0CTLW0 |= UCTXSTT;
+                        P1OUT ^= BIT0;
+                        break;
+            case 'A':   data = 0x4;
+                        UCB0CTLW0 |= UCTXSTT;
+                        P1OUT ^= BIT0;
+                        break;
+            case 'B':   data = 0x8;
+                        UCB0CTLW0 |= UCTXSTT;
+                        P1OUT ^= BIT0;
+                        break;
+            case '9':   data = 0x11;
+                        UCB0CTLW0 |= UCTXSTT;
+                        P1OUT ^= BIT0;
+                        break;
+            case 'C':   data = 0x12;
+                        UCB0CTLW0 |= UCTXSTT;
+                        P1OUT ^= BIT0;
+                        break;
+            case '0':   data = 0x14;
+                        UCB0CTLW0 |= UCTXSTT;
+                        P1OUT ^= BIT0;
+                        break;
+                       
+        }
+
+    P3IFG &= ~BIT0;  // Clear the interrupt flag
+    P3IFG &= ~BIT1;  // Clear the interrupt flag
+    P3IFG &= ~BIT2;  // Clear the interrupt flag
+    P3IFG &= ~BIT3;  // Clear the interrupt flag
+}
+
