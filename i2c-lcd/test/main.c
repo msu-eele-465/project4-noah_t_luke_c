@@ -41,63 +41,19 @@ int main(void) {
     while(1)
     {
         final = RXData;
+        // Switch statement prints the pattern description depending on recieved data
         switch(RXData)
         {
-            case 0:     break;
-            case 0x1:   clear_cgram();
-                        lcd_write(0b01110100);
-                        lcd_write(0b01101111);
-                        lcd_write(0b01100111);
-                        lcd_write(0b01100111);
-                        lcd_write(0b01101100);
-                        lcd_write(0b01100101);
-                        RXData = 0;
-                        break;
-            case 0x2:   clear_cgram();
-                        lcd_write(0b01110101);
-                        lcd_write(0b01110000);
-                        lcd_write(0b11111110);
-                        lcd_write(0b01100011);
-                        lcd_write(0b01101111);
-                        lcd_write(0b01110101);
-                        lcd_write(0b01101110);
-                        lcd_write(0b01110100);
-                        lcd_write(0b01100101);
-                        lcd_write(0b01110010);
-                        RXData = 0;
-                        break;
-            case 0x3:   clear_cgram();
-                        lcd_write(0b01101001);
-                        lcd_write(0b01101110);
-                        lcd_write(0b11111110);
-                        lcd_write(0b01100001);
-                        lcd_write(0b01101110);
-                        lcd_write(0b01100100);
-                        lcd_write(0b11111110);
-                        lcd_write(0b01101111);
-                        lcd_write(0b01110101);
-                        lcd_write(0b01110100);
-                        RXData = 0;
-                        break;
             case 0x10:  clear_cgram();
                         final_pos();
                         lcd_write(0b00111000);
+                        return_home();
                         int i = 0;
                         for(i = 0; i<0x100; i++)
                         {
-                            return_home();
                             lcd_write(i);
                             __delay_cycles(200000);
                         }
-                        RXData = 0;
-                        break;
-            case 0x14:  clear_cgram();
-                        lcd_write(0b01110011);
-                        lcd_write(0b01110100);
-                        lcd_write(0b01100001);
-                        lcd_write(0b01110100);
-                        lcd_write(0b01101001);
-                        lcd_write(0b01100011);
                         RXData = 0;
                         break;
             case 0x11:  blink_toggle();
@@ -138,11 +94,11 @@ int main(void) {
                         break;
             case 0x16:  break; 
         }
-        final = 0;
-        if(RXData != 0)
+        if(final != 0)
         {
             return_home();
         }
+        final = 0;
         
 
     }

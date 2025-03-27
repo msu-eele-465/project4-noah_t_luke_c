@@ -82,6 +82,7 @@ void cursor_right()
 void blink_toggle()
 {   
     P2OUT &= ~BIT0;
+    __delay_cycles(500);
     if(blink_status == 1)
     {
         if(cursor_status = 0)
@@ -114,6 +115,7 @@ void blink_toggle()
 void cursor_toggle()
 {
     P2OUT &= ~BIT0;
+    __delay_cycles(500);
     if(cursor_status == 1)
     {
         if(blink_status = 0)
