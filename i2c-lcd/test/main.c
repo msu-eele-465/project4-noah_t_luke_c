@@ -159,6 +159,7 @@ void __attribute__ ((interrupt(USCI_B0_VECTOR))) USCIB0_ISR (void)
 {
                                        // SLAVE0
         RXData = UCB0RXBUF;                              // Get RX data
+        P2OUT ^= BIT6;
         __bic_SR_register_on_exit(LPM0_bits);                       // Vector 24: RXIFG0 break;
     
 

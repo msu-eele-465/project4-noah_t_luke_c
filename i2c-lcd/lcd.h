@@ -36,6 +36,9 @@ void lcd_init()
     P1OUT &= ~BIT7;  
     P2DIR |= BIT0;  
     P2OUT &= ~BIT0;
+
+    P2DIR |= BIT6;
+    P2OUT &= ~BIT6;
 }
 
 // Brings cursor to last position on LCD screen
