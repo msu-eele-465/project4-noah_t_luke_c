@@ -15,6 +15,17 @@ void keypadInit(void){
     P1OUT &= ~BIT2;  // Clear P1.2
 
     P1DIR |= BIT3;  // P1.3 as output, BLUE
+const char rowPins[4] = {BIT0, BIT1, BIT2, BIT3};
+const char colPins[4] = {BIT0, BIT1, BIT2, BIT3};
+
+void keypadInit(void){
+
+    // Status LED setup
+    P1DIR |= BIT1;  // P1.1 as output
+    P1OUT &= ~BIT1;  // Clear P1.1
+    P1DIR |= BIT2;  // P1.2 as output
+    P1OUT &= ~BIT2;  // Clear P1.2
+    P1DIR |= BIT3;  // P1.3 as output
     P1OUT &= ~BIT3;  // Clear P1.3
 
     // P6.6 for keypress feedback
@@ -58,6 +69,17 @@ void lockKeypad(){
 
 
 
+
+        P1OUT &= ~BIT1;
+        P1OUT |= BIT3;
+        while(scanPad() != '1');
+        P1OUT |= BIT2;
+        while(scanPad() != '7');
+        while(scanPad() != '3');
+        while(scanPad() != '8');
+        P1OUT &= ~BIT2;
+        P1OUT &= ~BIT3;
+        P1OUT |= BIT1;
 }
 
 char scanPad() {
@@ -75,6 +97,8 @@ char scanPad() {
                 return keys[row][col];  // Return the pressed key
             }
         }
+
+     
     }
 
     return 0;  // Return 0 if no key is pressed
