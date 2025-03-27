@@ -6,7 +6,6 @@
 #include <lcd.h>
 
 unsigned char RXData = 0;
-unsigned char current = 0;
 unsigned char final = 0;
 
 
@@ -52,7 +51,6 @@ int main(void) {
                         lcd_write(0b01100111);
                         lcd_write(0b01101100);
                         lcd_write(0b01100101);
-                        current = 0x1;
                         RXData = 0;
                         break;
             case 0x2:   clear_cgram();
@@ -66,7 +64,6 @@ int main(void) {
                         lcd_write(0b01110100);
                         lcd_write(0b01100101);
                         lcd_write(0b01110010);
-                        current = 0x2;
                         RXData = 0;
                         break;
             case 0x3:   clear_cgram();
@@ -81,11 +78,10 @@ int main(void) {
                         lcd_write(0b01110101);
                         lcd_write(0b01110100);
                         RXData = 0;
-                        current = 0x3;
                         break;
-            case 0x6:   clear_cgram();
+            case 0x10:  clear_cgram();
                         final_pos();
-                        lcd_write(0b00110101);
+                        lcd_write(0b00111000);
                         int i = 0;
                         for(i = 0; i<0x100; i++)
                         {
@@ -93,7 +89,7 @@ int main(void) {
                             lcd_write(i);
                             __delay_cycles(200000);
                         }
-
+                        RXData = 0;
                         break;
             case 0x14:  clear_cgram();
                         lcd_write(0b01110011);
@@ -103,7 +99,6 @@ int main(void) {
                         lcd_write(0b01101001);
                         lcd_write(0b01100011);
                         RXData = 0;
-                        current = 0x14;
                         break;
             case 0x11:  blink_toggle();
                         break;
@@ -144,7 +139,10 @@ int main(void) {
             case 0x16:  break; 
         }
         final = 0;
-
+        if(RXData != 0)
+        {
+            return_home();
+        }
         
 
     }
