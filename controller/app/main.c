@@ -1,3 +1,7 @@
+
+
+#include <msp430fr2355.h>
+#include <stdbool.h>
 #include <msp430.h>
 #include "keypad.h"
 
@@ -9,7 +13,6 @@ int main (void){
 
     P1DIR |= BIT0;  // P1.0 as output, used for heartbeat LED
     P1OUT &= ~BIT0;  // Clear P1.0
-
     PM5CTL0 &= ~LOCKLPM5;  // Enable GPIO
 
     // Setup Timer B0
@@ -28,6 +31,8 @@ int main (void){
         lockKeypad();
         scanPad();
     }
+
+
 }
 
 //------------------------------------------------------------------------------
@@ -38,4 +43,3 @@ int main (void){
 __interrupt void ISR_TB0_CCR0(void) {
     P1OUT ^= BIT0;  // Toggle LED
     TB0CCTL0 &= ~CCIFG;  // Clear the interrupt flag
-}

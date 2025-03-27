@@ -2,6 +2,19 @@
 #include <stdbool.h>
 
 const char keys[4][4] = {{'1','2','3','A'},{'4','5','6','B'},{'7','8','9','C'},{'*','0','#','D'}};
+const char row_pins[4] = {BIT0, BIT1, BIT2, BIT3};
+const char col_pins[4] = {BIT0, BIT1, BIT2, BIT3};
+
+void keypadInit(void){
+
+    // Status RGB LED setup
+    P1DIR |= BIT1;  // P1.1 as output, RED  
+    P1OUT &= ~BIT1;  // Clear P1.1
+
+    P1DIR |= BIT2;  // P1.2 as output, GREEN
+    P1OUT &= ~BIT2;  // Clear P1.2
+
+    P1DIR |= BIT3;  // P1.3 as output, BLUE
 const char rowPins[4] = {BIT0, BIT1, BIT2, BIT3};
 const char colPins[4] = {BIT0, BIT1, BIT2, BIT3};
 
@@ -37,6 +50,26 @@ void keypadInit(void){
 //-----------------------------------------------Scan Keypad------------------------------------------------------------------------
 
 void lockKeypad(){
+        P1OUT |= BIT1;
+
+        while(scanPad() != '1');
+        P1OUT &= ~BIT1;
+        P1OUT |= BIT2;
+
+        while(scanPad() != '7');
+
+        while(scanPad() != '3');
+
+        while(scanPad() != '8');
+        P1OUT &= ~BIT1;
+        P1OUT &= ~BIT2;
+        P1OUT |= BIT3;
+
+
+
+
+
+
         P1OUT &= ~BIT1;
         P1OUT |= BIT3;
         while(scanPad() != '1');
@@ -54,16 +87,18 @@ char scanPad() {
 
     for (col = 0; col < 4; col++) {
         P6OUT &= ~(BIT0 | BIT1 | BIT2 | BIT3);  // Clear all column pins
-        P6OUT |= colPins[col];  // Set the current column pin high
+        P6OUT |= col_pins[col];  // Set the current column pin high
 
         for (row = 0; row < 4; row++) {
-            if ((P2IN & rowPins[row]) != 0) {  // Check if the row pin is high
-                while ((P2IN & rowPins[row]) != 0);  // Wait for key release
+            if ((P2IN & row_pins[row]) != 0) {  // Check if the row pin is high
+                while ((P2IN & row_pins[row]) != 0);  // Wait for key release
                 __delay_cycles(50000);  // Debounce delay
                 P6OUT ^= BIT6;
-                return keys[col][row];  // Return the pressed key
+                return keys[row][col];  // Return the pressed key
             }
         }
+
+     
     }
 
     return 0;  // Return 0 if no key is pressed
